@@ -1,0 +1,207 @@
+basePath: /
+definitions:
+  models.ItemDao:
+    properties:
+      count:
+        type: integer
+      name:
+        type: string
+      pricePerUnit:
+        type: integer
+      priceTotal:
+        type: integer
+    type: object
+  models.ItemDto:
+    properties:
+      count:
+        type: integer
+      itemName:
+        type: string
+    type: object
+  models.ItemToCartUserDto:
+    properties:
+      item:
+        $ref: '#/definitions/models.ItemDto'
+      user:
+        $ref: '#/definitions/models.UserDto'
+    type: object
+  models.OrderStatus:
+    properties:
+      name:
+        type: string
+    type: object
+  models.UpdateOrderStatusDto:
+    properties:
+      statusName:
+        type: string
+      uuid:
+        type: string
+    type: object
+  models.UserCart:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.ItemDao'
+        type: array
+      user:
+        $ref: '#/definitions/models.UserDto'
+    type: object
+  models.UserDto:
+    properties:
+      email:
+        type: string
+      userName:
+        type: string
+    type: object
+  models.UserOrder:
+    properties:
+      items:
+        items:
+          $ref: '#/definitions/models.ItemDao'
+        type: array
+      status:
+        $ref: '#/definitions/models.OrderStatus'
+      user:
+        $ref: '#/definitions/models.UserDto'
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  description: This is a sample server.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: Gin Swagger Example API
+  version: "1.0"
+paths:
+  /cart:
+    delete:
+      consumes:
+      - application/json
+      description: Remove Item From Cart.
+      parameters:
+      - description: Cart JSON
+        in: body
+        name: cart
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemToCartUserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Remove Item From Cart.
+      tags:
+      - cart
+    get:
+      consumes:
+      - application/json
+      description: Get Items From Cart.
+      parameters:
+      - description: Cart JSON
+        in: body
+        name: cart
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            $ref: '#/definitions/models.UserCart'
+      summary: Get Items From Cart.
+      tags:
+      - cart
+    post:
+      consumes:
+      - application/json
+      description: Add Item To Cart.
+      parameters:
+      - description: Cart JSON
+        in: body
+        name: cart
+        required: true
+        schema:
+          $ref: '#/definitions/models.ItemToCartUserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Add Item To Cart.
+      tags:
+      - cart
+  /order:
+    post:
+      consumes:
+      - application/json
+      description: Create order.
+      parameters:
+      - description: Create Order JSON
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Create order.
+      tags:
+      - order
+  /order-status:
+    post:
+      consumes:
+      - application/json
+      description: Changed status to order.
+      parameters:
+      - description: Order Change Status JSON
+        in: body
+        name: OrderStatus
+        required: true
+        schema:
+          $ref: '#/definitions/models.UpdateOrderStatusDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+      summary: Changed status to order.
+      tags:
+      - order
+  /orders:
+    post:
+      consumes:
+      - application/json
+      description: Get orders.
+      parameters:
+      - description: Get Orders JSON
+        in: body
+        name: User
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserDto'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            items:
+              $ref: '#/definitions/models.UserOrder'
+            type: array
+      summary: Get orders.
+      tags:
+      - order
+schemes:
+- http
+swagger: "2.0"

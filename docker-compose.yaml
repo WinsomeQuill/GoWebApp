@@ -1,0 +1,32 @@
+version: '3'
+
+services:
+  # PostgreSQL service
+  postgres:
+    image: postgres:latest
+    container_name: GoPg
+    environment:
+      POSTGRES_DB: PGDateBase
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: user
+    ports:
+      - "5432:5432"
+    networks:
+      - golang-network
+
+  # Golang Web app service
+  go_web_app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: GoWebApp
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    networks:
+      - golang-network
+
+networks:
+  golang-network:
+    driver: bridge
