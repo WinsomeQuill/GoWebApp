@@ -1,10 +1,11 @@
 package controllers
 
 import (
-	"GoWebApp/models"
+	"GoWebApp/models/Dto"
 	"GoWebApp/postgres"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -18,18 +19,18 @@ import (
 // @Success 200
 // @Router /cart [post]
 func AddItemToCart(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.ItemToCartUserDto)
+	reqBody := new(Dto.ItemToCartUserDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
 	}
 
 	if reqBody.Item.Count <= 0 {
-		c.JSON(http.StatusOK, gin.H{
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -37,8 +38,8 @@ func AddItemToCart(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	countTotal, err := pgConnect.GetItemCount(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
 			"message": "Unknown error!",
 		})
 		return
@@ -60,9 +61,9 @@ func AddItemToCart(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	err = pgConnect.InsertItemToCartUser(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}
@@ -82,11 +83,11 @@ func AddItemToCart(c *gin.Context, pgConnect postgres.PgConnect) {
 // @Success 200
 // @Router /cart [delete]
 func RemoveItemFromCart(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.ItemToCartUserDto)
+	reqBody := new(Dto.ItemToCartUserDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -94,8 +95,8 @@ func RemoveItemFromCart(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	countInCart, err := pgConnect.GetItemCountInCart(&reqBody.User)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
 			"message": "Unknown error!",
 		})
 		return
@@ -114,9 +115,9 @@ func RemoveItemFromCart(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	err = pgConnect.RemoveItemFromCartUser(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}
@@ -136,11 +137,11 @@ func RemoveItemFromCart(c *gin.Context, pgConnect postgres.PgConnect) {
 // @Success 200 {object} models.UserCart "ok"
 // @Router /cart [get]
 func GetCart(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.UserDto)
+	reqBody := new(Dto.UserDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -148,9 +149,9 @@ func GetCart(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	cart, err := pgConnect.GetCart(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}

@@ -4,10 +4,12 @@ import (
 	"GoWebApp/config"
 	"GoWebApp/controllers"
 	_ "GoWebApp/docs"
+	"GoWebApp/logger"
 	"GoWebApp/postgres"
 	"github.com/gin-gonic/gin"
 	"github.com/swaggo/files"
 	"github.com/swaggo/gin-swagger"
+	"log"
 )
 
 // @title Gin Swagger Example API
@@ -26,12 +28,21 @@ import (
 // @BasePath /
 // @schemes http
 func main() {
+	file, err := logger.OpenLogFile("./logger.log")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	log.SetOutput(file)
+	log.SetFlags(log.LstdFlags | log.Lshortfile | log.Lmicroseconds)
+
 	config := config.NewConfig()
 	pgConnect := postgres.NewPostgresPool(&config)
 
-	err := pgConnect.Migration()
+	err = pgConnect.Migration()
 	if err != nil {
-		panic(err)
+		log.Println(err)
+		return
 	}
 
 	r := gin.Default()

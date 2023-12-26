@@ -1,4 +1,4 @@
-package models
+package Dto
 
 import uuid2 "github.com/google/uuid"
 

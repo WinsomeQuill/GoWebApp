@@ -3,6 +3,8 @@ package postgres
 import (
 	"GoWebApp/config"
 	"GoWebApp/models"
+	"GoWebApp/models/Dao"
+	"GoWebApp/models/Dto"
 	"fmt"
 	uuid2 "github.com/google/uuid"
 	"gorm.io/driver/postgres"
@@ -61,7 +63,7 @@ func (r PgConnect) createOrderStatusIfNotExists() error {
 	return result.Error
 }
 
-func (r PgConnect) GetItemCount(itemDto *models.ItemToCartUserDto) (int64, error) {
+func (r PgConnect) GetItemCount(itemDto *Dto.ItemToCartUserDto) (int64, error) {
 	var count int64
 	result := r.pool.Raw(`
 			select count
@@ -72,7 +74,7 @@ func (r PgConnect) GetItemCount(itemDto *models.ItemToCartUserDto) (int64, error
 	return count, result.Error
 }
 
-func (r PgConnect) GetItemCountInCart(userDto *models.UserDto) (int64, error) {
+func (r PgConnect) GetItemCountInCart(userDto *Dto.UserDto) (int64, error) {
 	var count int64
 	result := r.pool.Raw(`
 			select c.count
@@ -84,7 +86,7 @@ func (r PgConnect) GetItemCountInCart(userDto *models.UserDto) (int64, error) {
 	return count, result.Error
 }
 
-func (r PgConnect) InsertItemToCartUser(itemDto *models.ItemToCartUserDto) error {
+func (r PgConnect) InsertItemToCartUser(itemDto *Dto.ItemToCartUserDto) error {
 	err := r.pool.Transaction(func(tx *gorm.DB) error {
 		var userId int64
 		result := r.pool.Raw(`
@@ -131,7 +133,7 @@ func (r PgConnect) InsertItemToCartUser(itemDto *models.ItemToCartUserDto) error
 	return err
 }
 
-func (r PgConnect) RemoveItemFromCartUser(itemDto *models.ItemToCartUserDto) error {
+func (r PgConnect) RemoveItemFromCartUser(itemDto *Dto.ItemToCartUserDto) error {
 	err := r.pool.Transaction(func(tx *gorm.DB) error {
 		result := r.pool.Exec(`
 			update carts c
@@ -183,8 +185,8 @@ func (r PgConnect) RemoveItemFromCartUser(itemDto *models.ItemToCartUserDto) err
 	return err
 }
 
-func (r PgConnect) GetCart(userDto *models.UserDto) (models.UserCart, error) {
-	var items []models.ItemDao
+func (r PgConnect) GetCart(userDto *Dto.UserDto) (models.UserCart, error) {
+	var items []Dao.ItemDao
 
 	result := r.pool.Raw(`
 			select i.name, c.count,i.price price_per_unit, i.price * c.count price_total
@@ -201,9 +203,9 @@ func (r PgConnect) GetCart(userDto *models.UserDto) (models.UserCart, error) {
 	return cart, result.Error
 }
 
-func (r PgConnect) InsertOrder(userDto *models.UserDto) error {
+func (r PgConnect) InsertOrder(userDto *Dto.UserDto) error {
 	err := r.pool.Transaction(func(tx *gorm.DB) error {
-		var items []models.ItemDao
+		var items []Dao.ItemDao
 
 		result := r.pool.Raw(`
 			select i.name, c.count,i.price price_per_unit, i.price * c.count price_total
@@ -238,11 +240,11 @@ func (r PgConnect) InsertOrder(userDto *models.UserDto) error {
 	return err
 }
 
-func (r PgConnect) GetOrders(userDto *models.UserDto) ([]models.UserOrder, error) {
+func (r PgConnect) GetOrders(userDto *Dto.UserDto) ([]models.UserOrder, error) {
 	var orders []models.UserOrder
 
 	err := r.pool.Transaction(func(tx *gorm.DB) error {
-		var items []models.ItemDao
+		var items []Dao.ItemDao
 		var status models.OrderStatus
 		var uuids []uuid2.UUID
 
@@ -294,7 +296,7 @@ func (r PgConnect) GetOrders(userDto *models.UserDto) ([]models.UserOrder, error
 	return orders, err
 }
 
-func (r PgConnect) UpdateOrderStatus(status *models.UpdateOrderStatusDto) error {
+func (r PgConnect) UpdateOrderStatus(status *Dto.UpdateOrderStatusDto) error {
 	result := r.pool.Exec(`
 		update orders
 		set order_status_id = (select id from order_statuses where name = ?)

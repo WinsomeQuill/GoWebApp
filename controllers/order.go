@@ -1,10 +1,10 @@
 package controllers
 
 import (
-	"GoWebApp/models"
+	"GoWebApp/models/Dto"
 	"GoWebApp/postgres"
-	"fmt"
 	"github.com/gin-gonic/gin"
+	"log"
 	"net/http"
 )
 
@@ -18,11 +18,11 @@ import (
 // @Success 200
 // @Router /order [post]
 func CreateOrder(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.UserDto)
+	reqBody := new(Dto.UserDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -30,8 +30,8 @@ func CreateOrder(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	countInCart, err := pgConnect.GetItemCountInCart(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
 			"message": "Unknown error!",
 		})
 		return
@@ -46,9 +46,9 @@ func CreateOrder(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	err = pgConnect.InsertOrder(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}
@@ -68,11 +68,11 @@ func CreateOrder(c *gin.Context, pgConnect postgres.PgConnect) {
 // @Success 200 {object} []models.UserOrder "ok"
 // @Router /orders [post]
 func GetOrders(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.UserDto)
+	reqBody := new(Dto.UserDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -80,9 +80,9 @@ func GetOrders(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	orders, err := pgConnect.GetOrders(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}
@@ -102,11 +102,11 @@ func GetOrders(c *gin.Context, pgConnect postgres.PgConnect) {
 // @Success 200
 // @Router /order-status [post]
 func OrderChangeStatus(c *gin.Context, pgConnect postgres.PgConnect) {
-	reqBody := new(models.UpdateOrderStatusDto)
+	reqBody := new(Dto.UpdateOrderStatusDto)
 	err := c.ShouldBindJSON(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
+		log.Println(err)
+		c.JSON(http.StatusBadRequest, gin.H{
 			"message": "Invalid request!",
 		})
 		return
@@ -114,9 +114,9 @@ func OrderChangeStatus(c *gin.Context, pgConnect postgres.PgConnect) {
 
 	err = pgConnect.UpdateOrderStatus(reqBody)
 	if err != nil {
-		fmt.Println(err)
-		c.JSON(http.StatusOK, gin.H{
-			"message": "Invalid request!",
+		log.Println(err)
+		c.JSON(http.StatusBadGateway, gin.H{
+			"message": "Unknown error!",
 		})
 		return
 	}
